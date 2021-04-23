@@ -51,7 +51,7 @@ Double_t GammaContribution(Double_t *x, Double_t *par)
 
 Double_t CohJPsiContribution(Double_t *x, Double_t *par)
 {
-    return PowerLaw(x,par) + Gaussian(x, &par[4]) + Gaussian(x, &par[7]);
+    return LogNormal(x,par) + TailExpo(x, &par[3]);
 }
  
 Double_t IncohJPsiContribution(Double_t *x, Double_t *par)
@@ -67,7 +67,7 @@ Double_t Linear(Double_t *x, Double_t *par)
 Double_t FitFunction(Double_t *x, Double_t *par)
 {
     return GammaContribution(x, par) + CohJPsiContribution(x, &par[5]) 
-    + IncohJPsiContribution(x, &par[15]) + Linear(x, &par[18]);
+    + IncohJPsiContribution(x, &par[10]) + Linear(x, &par[13]);
 }
 
 
@@ -75,14 +75,14 @@ void fitPt_data()
 {
  
  TF1* fgamma     = new TF1("fgamma", GammaContribution, 0., 3., 5);
- TF1* fcohjpsi   = new TF1("fcohjpsi", CohJPsiContribution, 0.,3.,10);
+ TF1* fcohjpsi   = new TF1("fcohjpsi", CohJPsiContribution, 0.,3.,5);
  TF1* fincohjpsi = new TF1("fincohjpsi", IncohJPsiContribution, 0., 3., 3);
  TF1* fhadro     = new TF1("fhadro", Linear, 0., 3., 1); //hadronic contribution
 
  //global fit function
- TF1* Fitfct     = new TF1("Fitfct",FitFunction,0.,3.,19);
- Double_t par[19];
- for(int i=0; i<19;i++){Fitfct->SetParameters(i,1.);}
+ TF1* Fitfct     = new TF1("Fitfct",FitFunction,0.,3.,14);
+ Double_t par[14];
+ for(int i=0; i<14;i++){Fitfct->SetParameters(i,1.);}
  Fitfct->SetLineColor(kRed);
 
  //gamma gamma contribution
@@ -91,7 +91,7 @@ void fitPt_data()
  fgamma->SetLineColor(kBlue);
  
  //jpsi coh contribution
- fcohjpsi->SetParameters(1.,1.,1.,1.,1.,1.,1.,1.,1.,1.);
+ fcohjpsi->SetParameters(1.,1.,1., 1.,1.);
  fcohjpsi->SetLineStyle(4);
  fcohjpsi->SetLineColor(kMagenta);
 
@@ -107,28 +107,39 @@ void fitPt_data()
 
 //Parameters for mass range [3.4-5.]
  
- Fitfct->SetParLimits(0,1.,200.);
+ //Fitfct->SetParLimits(0,1.,200.);
  Fitfct->SetParLimits(1,-4.,-1.); //fgamma p1
  Fitfct->SetParLimits(2,0.5,0.6); //fgamma p2
  Fitfct->SetParLimits(3,1.,1.e5); //fgamma p3
- Fitfct->SetParLimits(4,0.02,0.03);//fgamma p4
+ Fitfct->SetParLimits(4,0.02,0.04);//fgamma p4
 
- Fitfct->SetParLimits(5,0.,50.); //fcoh p0 norm
+/*
+ //Fitfct->SetParLimits(5,0.,50.); //fcoh p0 norm
  Fitfct->FixParameter(6,0.0003399);    //fcoh p1
  Fitfct->FixParameter(7,-1.372);     //fcoh p2
  Fitfct->FixParameter(8,0.05854);     //fcoh p3
- Fitfct->SetParLimits(9,1.,50.);   //fcoh p4 norm
+ //Fitfct->SetParLimits(9,1.,50.);   //fcoh p4 norm
  Fitfct->FixParameter(10,0.2902);    //fcoh p5
  Fitfct->FixParameter(11,0.09176);   //fcoh p6
- Fitfct->SetParLimits(12,1.,50.);   //fcoh p7 norm
+ //Fitfct->SetParLimits(12,1.,50.);   //fcoh p7 norm
  Fitfct->FixParameter(13,0.3382);    //fcoh p8
  Fitfct->FixParameter(14,0.2344);    //fcoh p9
+*/
 
- Fitfct->SetParLimits(15,1.,100.);   //fincoh p0 norm
- Fitfct->FixParameter(16,-0.1312);    //fincoh p1
- Fitfct->FixParameter(17,0.5447);     //fincoh p2
+ Fitfct->SetParLimits(5,0.,100.); //fcoh p0 norm
+ Fitfct->FixParameter(6,-0.7683);    //fcoh p1
+ Fitfct->FixParameter(7,0.468);     //fcoh p2
+ Fitfct->SetParLimits(8,0.,500.);     //fcoh p3 norm
+ Fitfct->FixParameter(9,0.3596);   //fcoh p4
+ 
 
- Fitfct->FixParameter(18,30.14);//fhadro p0
+
+ Fitfct->SetParLimits(10,0.,60.);   //fincoh p0 norm
+ Fitfct->FixParameter(11,-0.1312);    //fincoh p1
+ Fitfct->FixParameter(12,0.5448);     //fincoh p2
+
+ Fitfct->FixParameter(13,30.14);//fhadro p0
+
 
 
  // file data
@@ -172,13 +183,14 @@ void fitPt_data()
  
  Fitfct->GetParameters(par);
  fgamma->SetParameters(par);
- fcohjpsi->SetParameters(&par[6]);
- fincohjpsi->SetParameters(&par[16]);
- fhadro->SetParameters(&par[19]);
+ fcohjpsi->SetParameters(&par[5]);
+ fincohjpsi->SetParameters(&par[10]);
+ fhadro->SetParameters(&par[13]);
  
  fgamma->Draw("same");
  fcohjpsi->Draw("same");
  fincohjpsi->Draw("same");
  fhadro->Draw("same");
+ c1->BuildLegend(0.67,0.14,0.90,0.28);
 
 }

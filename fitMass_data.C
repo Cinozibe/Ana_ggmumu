@@ -70,7 +70,7 @@ Double_t poly6(Double_t *x, Double_t *par)
 
 Double_t sum(Double_t *x, Double_t *par)
 {
-	return  poly6(x, par) + CrystalBallExtended(x,&par[7]) + CrystalBallExtended(x, &par[14]);
+	return  poly6(x, par) + CrystalBallExtended(x,&par[7]) + CrystalBallExtended(x,&par[14]);
 }
 
 
@@ -108,16 +108,26 @@ void fitMass_data()
  Fitfct->SetLineColor(kRed);
 
  TF1* CBE_coh = new TF1("CBE_coh",CrystalBallExtended,1.9,5.,7);
- CBE_coh->SetParameters(10.,1.,1.,1.,1.,1.,1.);
+ CBE_coh->SetParameters(1.,1.,1.,1.,1.,1.,1.);
  CBE_coh->SetLineStyle(4);
  CBE_coh->SetLineColor(kMagenta);
+ /*
+ Fitfct->FixParameter(1,7053);
+ Fitfct->FixParameter(2,3379);
+ Fitfct->FixParameter(3,-1672);
+ Fitfct->FixParameter(4,-75.32);
+ Fitfct->FixParameter(5,95.63);
+ Fitfct->FixParameter(6,-9.487);
+*/
 
+ Fitfct->FixParameter(7,171.4);
  Fitfct->FixParameter(8,3.108);
  Fitfct->FixParameter(9,0.05666);
  Fitfct->FixParameter(10,AlphaL_coh);
  Fitfct->FixParameter(11,nL_coh);
  Fitfct->FixParameter(12,AlphaR_coh);
  Fitfct->FixParameter(13,nR_coh);
+
 
  TF1* CBE_incoh = new TF1("CBE_incoh",CrystalBallExtended,1.9,5.,7);
  CBE_incoh->SetParameters(10.,1.,1.,1.,1.,1.,1.);
@@ -161,12 +171,15 @@ void fitMass_data()
  CBE_coh->Draw("same");
  CBE_incoh->Draw("same");
  c1->BuildLegend(0.67,0.14,0.90,0.28);
-
- fHistoDiMuonOS->GetAxis(1)->SetRange(fHistoDiMuonOS->GetAxis(1)->FindBin(0.),fHistoDiMuonOS->GetAxis(1)->FindBin(0.3));
- fHistoDiMuonOS->GetAxis(0)->SetRange(fHistoDiMuonOS->GetAxis(0)->FindBin(1.9),fHistoDiMuonOS->GetAxis(0)->FindBin(5.));
-
- Double_t N_jpsi_incoh = CBE_incoh->Integral(1.9,5.);
  
- Double_t N_GG = fgamma->Integral(1.9,5.);
- cout << "N_Jpsi_incoh= " << N_jpsi_incoh << endl << "N_GG= " << N_GG << endl;
+
+ Double_t bin_width = h1->GetBinWidth(1);
+ cout << "Bin width: " << bin_width << endl;
+
+ Double_t N_jpsi_coh = CBE_coh->Integral(3.4,5.)/bin_width;
+ cout << "N_Jpsi_coh= " << N_jpsi_coh << endl;
+
+ Double_t N_jpsi_incoh = CBE_incoh->Integral(3.4,5.)/bin_width;
+ cout << "N_Jpsi_incoh= " << N_jpsi_incoh << endl;
+ 
 }

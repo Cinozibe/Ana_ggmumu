@@ -205,6 +205,9 @@ void plot_lego(){
 
  //coherent jpsi contribution
  Fitfct->FixParameter(15,174.595);
+ ///alt par///
+ //Fitfct->FixParameter(15,9000.);
+ /////////////
  Fitfct->FixParameter(16,3.108);
  Fitfct->FixParameter(17,0.05666);
  Fitfct->FixParameter(18,AlphaL_coh);
@@ -263,22 +266,24 @@ void plot_lego(){
 
 //draw the pt and mass distribution
  TCanvas* c2 = new TCanvas("c2","proj pt");
- c2->Divide(1,2);
+ //c2->Divide(1,2);
  c2->cd(1);
 
  TH1D* hProjPt = h1->ProjectionX("Pt_Distri",0,-1,"");
- hProjPt->SetTitle("p_{T} Distribution");
+ hProjPt->SetTitle("p_{T} Distribution - [1.9-5] GeV/c^{2} - Data;p_{T} GeV/c;entries ");
  hProjPt->Draw("e");
-
+/*
  c2->cd(2);
 
  TH1D* hProjMass = h1->ProjectionY("Mass_Distri",0,-1,"");
  hProjMass->SetTitle("M_{#mu#mu} Distribution");
  hProjMass->Draw("e");
-
+*/
 
 // comparison between data and pt distribution 3D fit
- TH2D* hRandFit_Pt = new TH2D("hRandFit_Pt", "histo filled with fitfct; p_{T} GeV/c ;entries", 21, 0., 1., 156, 1.9, 5.);
+ //TH2D* hRandFit_Pt = new TH2D("hRandFit_Pt", "histo filled with fitfct; p_{T} GeV/c ;entries", 21, 0., 1., 156, 1.9, 5.);
+ TH2D* hRandFit_Pt = (TH2D*) h1->Clone("randfit_pt");
+ hRandFit_Pt->Reset();
  hRandFit_Pt->FillRandom("Fitfct",8777000);
  hRandFit_Pt->Scale(0.001);
 
@@ -287,6 +292,7 @@ void plot_lego(){
  h2->SetMarkerStyle(4);
  h2->SetMarkerSize(0.4);
 
+ h2->SetTitle("histo filled with fitfct;p_{T} GeV/c;entries");
  hData->SetTitle("Data");
 
  TCanvas* c3 = new TCanvas("c3", "test rand fit");
@@ -299,13 +305,15 @@ void plot_lego(){
 
 
 //comparison between data and mass distribution 3D fit
- TH2D* hRandFit_Mass = new TH2D("hRandFit_Mass", "histo filled with fitfct; p_{T} GeV/c ;M_{#mu#mu} GeV/c^{2}", 21, 0., 1., 156, 1.9, 5.);
+ TH2D* hRandFit_Mass = (TH2D*) h1->Clone("hrandfit_mass");
+ hRandFit_Mass->Reset();
  hRandFit_Mass->FillRandom("Fitfct",8777000);
 
  //scale to have a good comparison between data and fit
  hRandFit_Mass->Scale(0.001);
 
  TH1D* h3 = hRandFit_Mass->ProjectionY();
+ h3->SetTitle("histo filled with fitfct;M_{#mu#mu} GeV/c^{2};entries");
  h3->SetLineColor(kRed);
  h3->SetMarkerStyle(4);
  h3->SetMarkerSize(0.4);
@@ -323,8 +331,9 @@ void plot_lego(){
  TCanvas* c5 = new TCanvas("c5", "test 2 windows",1300.,500.);
  c5->Divide(2,1);
  c5->cd(1);
- //h3->SetTitle("histo filled with fit function (rescaled)");
+ h3->SetTitle("histo filled with fit function (rescaled)");
  h3->Draw("e");
+ //h3->GetYaxis()->SetRangeUser(50.,100.);
 
  c5->cd(2);
  hData_mass->Draw("e");

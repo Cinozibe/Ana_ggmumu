@@ -24,26 +24,25 @@ void cross_section()
 {
 
  const char *rapidity = "-4 < y < -2.5";
- const char *mass = "3.4 < m_{#mu#mu} < 5";
+ const char *mass = "1.9 < m_{#mu#mu} < 2.6";
  TLatex latex;
  latex.SetTextSize(0.025);
  
 //get reconstructed file
- TFile* file_reco = TFile::Open("/Users/nicolasbize/Desktop/Stage_ALICE/analysisfiles/AnalysisResultsGammaGammaMedium.root");
+ TFile* file_reco = TFile::Open("/Users/nicolasbize/Desktop/Stage_ALICE/analysisfiles/AnalysisResults_embedding_weighted.root");
  TList* lCMUL7DiMuonHist_reco = (TList*) file_reco->Get("ReconstructedHistos_CAny");
 
- THnSparseT<TArrayD>* fHistoDiMuonOS = (THnSparseT<TArrayD>*) lCMUL7DiMuonHist_reco->FindObject("fHistoDimuonReconstructed");
+ THnSparseT<TArrayD>* fHistoDiMuonOS = (THnSparseT<TArrayD>*) lCMUL7DiMuonHist_reco->FindObject("fHistoDiMuonOS");
  fHistoDiMuonOS->GetAxis(1)->SetRange(fHistoDiMuonOS->GetAxis(1)->FindBin(0.),fHistoDiMuonOS->GetAxis(1)->FindBin(1.));
- fHistoDiMuonOS->GetAxis(0)->SetRange(fHistoDiMuonOS->GetAxis(0)->FindBin(3.4),fHistoDiMuonOS->GetAxis(0)->FindBin(5.));
+ fHistoDiMuonOS->GetAxis(0)->SetRange(fHistoDiMuonOS->GetAxis(0)->FindBin(1.9),fHistoDiMuonOS->GetAxis(0)->FindBin(5.));
 
 //get generated file
- TFile* file_gen = TFile::Open("/Users/nicolasbize/Desktop/Stage_ALICE/analysisfiles/AnalysisResultsGammaGammaMedium.root");
+ TFile* file_gen = TFile::Open("/Users/nicolasbize/Desktop/Stage_ALICE/analysisfiles/AnalysisResults_embedding_weighted.root");
  TList* lCMUL7DiMuonHist_gen = (TList*) file_gen->Get("GeneratedHistos_CAny");
 
- THnSparseT<TArrayD>* fHistoJPsiGenerated = (THnSparseT<TArrayD>*) lCMUL7DiMuonHist_gen->FindObject("fHistoDimuonGenerated");
+ THnSparseT<TArrayD>* fHistoJPsiGenerated = (THnSparseT<TArrayD>*) lCMUL7DiMuonHist_gen->FindObject("fHistoJPsiGenerated");
  fHistoJPsiGenerated->GetAxis(1)->SetRange(fHistoJPsiGenerated->GetAxis(1)->FindBin(0.),fHistoJPsiGenerated->GetAxis(1)->FindBin(1.));
- fHistoJPsiGenerated->GetAxis(0)->SetRange(fHistoJPsiGenerated->GetAxis(0)->FindBin(3.4),fHistoJPsiGenerated->GetAxis(0)->FindBin(5.));
-
+ fHistoJPsiGenerated->GetAxis(0)->SetRange(fHistoJPsiGenerated->GetAxis(0)->FindBin(1.9),fHistoJPsiGenerated->GetAxis(0)->FindBin(5.));
  TH1D* hGen  = (TH1D*) fHistoJPsiGenerated->Projection(1);
  hGen->SetTitle("Generated");
  hGen->Rebin(2); //2 bins are merged into one
@@ -64,7 +63,7 @@ void cross_section()
 
  //hReco->Scale(10);
  TH1D* hAccEff = (TH1D*) hReco->Clone("hAccEff");
- hAccEff->SetTitle("Acceptance efficacity - ggm; p_{T} GeV/c ; Acc x #epsilon");
+ hAccEff->SetTitle("Acceptance efficacity - JPsi embedding; p_{T} GeV/c ; Acc x #epsilon");
  hAccEff->Divide(hReco,hGen);
 
  TCanvas* c1 = new TCanvas("c1", "acceff");
@@ -72,8 +71,8 @@ void cross_section()
  hAccEff->GetXaxis()->SetRangeUser(0.,.3);
  hAccEff->SetStats(0);
  hAccEff->Draw("e");
- hAccEff->GetYaxis()->SetRangeUser(0.001,.65);
- latex.DrawLatex(.25,.4,mass);
+ //hAccEff->GetYaxis()->SetRangeUser(0.001,.65);
+ //latex.DrawLatex(.25,.145,mass);
 
  TH1D* hCS = (TH1D*) hAccEff->Clone();
  //TH1D* hCS = new TH1D("hCS","Cross Section", 3, 0.,0.3);
@@ -83,23 +82,24 @@ void cross_section()
  hN_gg->SetStats(1);
  hN_gg->Reset();
 
-/*
+
 //[1.9-2.6] GeV/c^2
  for (int i_0 = 0; i_0<147 ; i_0 ++){hN_gg->Fill(0);}
  for (int i_1 = 0; i_1<103  ; i_1 ++){hN_gg->Fill(0.1);}
  for (int i_2 = 0; i_2<52  ; i_2 ++){hN_gg->Fill(0.2);}
-
+/*
  //[2.6-3.4] GeV/c^2
  for (int i_0 = 0; i_0<92 ; i_0 ++){hN_gg->Fill(0);}
  for (int i_1 = 0; i_1<158  ; i_1 ++){hN_gg->Fill(0.1);}
  for (int i_2 = 0; i_2<85  ; i_2 ++){hN_gg->Fill(0.2);}
 */
+/*
  //[3.4-5] GeV/c^2
  for (int i_0 = 0; i_0<179 ; i_0 ++){hN_gg->Fill(0);}
  for (int i_1 = 0; i_1<92  ; i_1 ++){hN_gg->Fill(0.1);}
  for (int i_2 = 0; i_2<18  ; i_2 ++){hN_gg->Fill(0.2);}
- 
- //for (int i=0;i<10;i++){hUnit->AddBinContent(i);}
+ */
+
 
  TCanvas* c2 = new TCanvas("c2", "test N");
  c2->cd();
@@ -109,7 +109,7 @@ void cross_section()
  latex.DrawLatex(.25,130.,mass);
 
  hCS->Divide(hN_gg,hAccEff);
- hCS->SetTitle("Cross section ggtomu - [3.4-5.] GeV/c^{2};p_{T} GeV/c; #frac{d#sigma_{#gamma#gamma to #mu#mu}}{dy} #mub");
+ hCS->SetTitle("Cross section ggtomu - [1.9-2.6] GeV/c^{2};p_{T} GeV/c; #frac{d#sigma_{#gamma#gamma to #mu#mu}}{dy} #mub");
  hCS->SetLineColor(kRed+1);
  hCS->SetMarkerStyle(20);
  hCS->SetMarkerSize(0.4);
